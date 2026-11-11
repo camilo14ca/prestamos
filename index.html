@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Préstamos">
+<title>Sistema de Préstamos</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#0b1220;--mut:#6b7280;--bd:#e8ebf2;--pri:#4f46e5;--pri2:#4338ca;--prisoft:#eef2ff;--ok:#059669;--oksoft:#d1fae5;--warn:#d97706;--warnsoft:#fef3c7;--bad:#dc2626;--badsoft:#fee2e2;--side:#0b1220;--r:18px;--sh:0 1px 2px rgba(16,24,40,.04),0 4px 16px rgba(16,24,40,.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{overflow-x:hidden;font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:90px;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+header{position:sticky;top:0;z-index:10;background:rgba(244,246,251,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:14px 18px;padding-top:max(14px,env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;gap:10px}
+header .hi small{display:block;color:var(--mut);font-size:12px;font-weight:500}header .hi small::first-letter{text-transform:uppercase}
+header .hi h1{font-size:20px;font-weight:800;letter-spacing:-.02em}
+#syncBadge{font-size:12px;font-weight:600;background:#fff;border:1px solid var(--bd);padding:7px 12px;border-radius:99px;cursor:pointer;white-space:nowrap;box-shadow:var(--sh)}
+main{max-width:1100px;margin:0 auto;padding:4px 18px 18px}
+.view{display:none;animation:fade .25s ease}.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* HERO */
+.hero{background:radial-gradient(120% 140% at 100% 0%,#6366f1 0%,#4338ca 35%,#1e1b4b 100%);color:#fff;border-radius:24px;padding:22px;position:relative;overflow:hidden;box-shadow:0 12px 30px rgba(67,56,202,.35)}
+.hero:after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.07);right:-60px;bottom:-90px}
+.hero small{opacity:.8;font-size:13px;font-weight:500}
+.hero .big{font-size:34px;font-weight:800;letter-spacing:-.03em;margin:4px 0 16px}
+.hero .sub{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative;z-index:1}
+.hero .sub div{background:rgba(255,255,255,.12);border-radius:14px;padding:10px 12px}
+.hero .sub b{display:block;font-size:16px;margin-top:2px}
+.prog{margin-top:14px;position:relative;z-index:1}.prog .t{display:flex;justify-content:space-between;font-size:12px;opacity:.85;margin-bottom:6px}
+.prog .b{height:8px;background:rgba(255,255,255,.2);border-radius:9px;overflow:hidden}.prog .b i{display:block;height:100%;background:linear-gradient(90deg,#a5f3fc,#34d399);border-radius:9px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}
+@media(min-width:760px){.grid{grid-template-columns:repeat(3,1fr)}}
+.kpi{background:var(--card);border-radius:var(--r);padding:14px;box-shadow:var(--sh);display:flex;gap:12px;align-items:center;min-width:0}
+.kpi .ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:19px;flex-shrink:0}
+.kpi small{color:var(--mut);font-size:12px;font-weight:500;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi b{font-size:17px;font-weight:700;display:block;margin-top:2px;letter-spacing:-.01em}
+.c1{background:#eef2ff}.c2{background:#ecfdf5}.c3{background:#fff7ed}.c4{background:#fdf2f8}.c5{background:#f0f9ff}.c6{background:#fef2f2}
+.sect{display:flex;justify-content:space-between;align-items:center;margin:24px 2px 10px}
+h2{font-size:16px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:7px}
+.sect .cnt{font-size:12px;color:var(--mut);font-weight:600}
+.dash{display:grid;gap:0 18px}@media(min-width:900px){.dash{grid-template-columns:1fr 1fr}}
+.card{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:10px;box-shadow:var(--sh)}
+.list{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;border-bottom:1px solid var(--bd);transition:background .15s}
+.row:last-child{border-bottom:none}.row:hover{background:#f9fafb}
+.av{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;flex-shrink:0;color:#fff}
+.row .l{flex:1;min-width:0}.row .l b{display:block;font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .l small,.mut{color:var(--mut);font-size:12.5px}
+.row .r{text-align:right;flex-shrink:0}.row .r b{font-size:14.5px;font-weight:700;display:block}
+.mini{height:4px;background:#eef0f4;border-radius:9px;overflow:hidden;margin-top:6px;max-width:220px}.mini i{display:block;height:100%;background:var(--pri);border-radius:9px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;letter-spacing:.02em}
+.t-ok{background:var(--oksoft);color:var(--ok)}.t-pen{background:var(--warnsoft);color:var(--warn)}.t-bad{background:var(--badsoft);color:var(--bad)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+input,select,textarea{font:inherit;font-size:15px;padding:12px 14px;border:1.5px solid var(--bd);border-radius:12px;background:#fff;width:100%;color:var(--tx);outline:none;transition:border .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--pri);box-shadow:0 0 0 4px var(--prisoft)}
+.tools input{flex:1 1 200px}.tools select{flex:0 1 170px;width:auto}
+.chips{display:flex;gap:8px;overflow-x:auto;margin-bottom:12px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{border:1.5px solid var(--bd);background:#fff;border-radius:99px;padding:8px 14px;font:inherit;font-size:13px;font-weight:600;color:var(--mut);cursor:pointer;white-space:nowrap}
+.chip.on{background:var(--tx);border-color:var(--tx);color:#fff}
+label{font-size:12.5px;font-weight:600;color:var(--mut);display:block;margin:12px 0 6px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{font:inherit;font-weight:700;font-size:14px;border:none;border-radius:12px;padding:12px 16px;background:var(--pri);color:#fff;cursor:pointer;transition:transform .1s,background .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.btn:hover{background:var(--pri2)}.btn:active{transform:scale(.97)}
+.btn.sec{background:#f1f3f8;color:var(--tx)}.btn.sec:hover{background:#e6e9f1}.btn.bad{background:var(--badsoft);color:var(--bad)}.btn.wa{background:#16a34a}.btn.sm{padding:8px 12px;font-size:13px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:stretch}.btns .btn{flex:1 1 140px;height:48px;white-space:nowrap}
+/* NAV movil */
+nav{position:fixed;bottom:12px;left:12px;right:12px;background:var(--side);border-radius:22px;display:flex;z-index:10;padding:6px;margin-bottom:env(safe-area-inset-bottom);box-shadow:0 10px 30px rgba(11,18,32,.3)}
+nav button{flex:1;border:none;background:none;padding:8px 0;font:inherit;font-size:11px;font-weight:600;color:#94a3b8;cursor:pointer;border-radius:16px;transition:.2s}
+nav button span{display:block;font-size:19px;line-height:1.3}
+nav button.on{background:rgba(255,255,255,.1);color:#fff}
+nav .brand{display:none}
+#fab{position:fixed;right:20px;bottom:96px;height:54px;padding:0 20px;border-radius:99px;background:var(--pri);color:#fff;font:inherit;font-weight:700;font-size:15px;border:none;box-shadow:0 10px 24px rgba(79,70,229,.45);cursor:pointer;z-index:11;display:flex;align-items:center;gap:6px}
+#fab span{display:grid}#fab span svg.i{width:22px;height:22px;stroke-width:2.5}
+/* Escritorio: menu lateral */
+@media(min-width:900px){
+ body{padding-bottom:0;padding-left:240px}
+ nav{top:0;bottom:0;left:0;right:auto;width:240px;flex-direction:column;border-radius:0;margin:0;padding:22px 14px;gap:4px;box-shadow:none}
+ nav .brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;font-size:18px;padding:4px 10px 26px}
+ nav .brand i{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#818cf8,#4f46e5);display:grid;place-items:center;font-style:normal}nav .brand i svg.i{width:20px;height:20px}
+ nav button{flex:0;display:flex;align-items:center;gap:12px;padding:12px 14px;font-size:14px;text-align:left}
+ nav button span{font-size:18px}
+ #fab{bottom:28px;right:32px}
+ header{padding:22px 32px 10px}main{padding:4px 32px 32px}
+}
+.modal{position:fixed;inset:0;background:rgba(11,18,32,.45);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.modal.on{display:flex}
+.sheet{background:#fff;width:100%;max-width:580px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));animation:up .25s ease}
+@keyframes up{from{transform:translateY(30px);opacity:.5}to{transform:none;opacity:1}}
+@media(min-width:760px){.modal{align-items:center}.sheet{border-radius:24px;padding:24px}}
+.sheet h3{font-size:19px;font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;letter-spacing:-.02em}
+.x{background:#f1f3f8;border:none;width:34px;height:34px;border-radius:50%;cursor:pointer;color:var(--mut);display:grid;place-items:center;flex-shrink:0}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:9px 4px;border-bottom:1px solid var(--bd);text-align:left}th{font-size:12px;color:var(--mut);font-weight:600}td.n,th.n{text-align:right}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;font-size:14px;margin:12px 0;background:#f8f9fc;border-radius:14px;padding:14px}.dl dt{color:var(--mut)}.dl dd{text-align:right;font-weight:700}
+.bar{height:8px;background:#eef0f4;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#6366f1,#22c55e);border-radius:9px}
+#toast{position:fixed;left:50%;bottom:170px;transform:translateX(-50%) translateY(10px);background:var(--side);color:#fff;padding:12px 18px;border-radius:14px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:.25s;z-index:30;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%)}
+.empty{text-align:center;color:var(--mut);padding:26px 10px;font-size:14px}
+.help{font-size:13px;color:var(--mut);line-height:1.55}.help code{background:#f1f3f8;padding:2px 6px;border-radius:6px}
+.soft{background:#f8f9fc;border-radius:14px;padding:14px}
+svg.i{width:1.15em;height:1.15em;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:-.2em}
+.kpi .ic svg.i{width:21px;height:21px}
+.c1{color:#4f46e5}.c2{color:#059669}.c3{color:#d97706}.c4{color:#db2777}.c5{color:#0284c7}.c6{color:#dc2626}
+nav button span svg.i{width:22px;height:22px}
+.av{position:relative;overflow:hidden}.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .2s}.av img.ok{opacity:1}
+.av.xl{width:84px;height:84px;font-size:28px}
+.avwrap{position:relative;display:inline-block;cursor:pointer}.avwrap .cam{position:absolute;right:-2px;bottom:-2px;width:30px;height:30px;border-radius:50%;background:var(--pri);color:#fff;display:grid;place-items:center;border:3px solid #fff}
+.cli-head{display:flex;align-items:center;gap:16px;margin:6px 0 4px}
+.hero .ilu{position:absolute;right:14px;top:10px;width:150px;opacity:.95;z-index:0;pointer-events:none}
+@media(max-width:759px){.hero .ilu{width:104px;right:6px;top:8px}}
+.empty svg.ill{width:120px;height:auto;display:block;margin:0 auto 10px}
+.docs{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
+.doc{position:relative;aspect-ratio:1;border-radius:14px;overflow:hidden;background:#eef0f4;cursor:pointer;display:grid;place-items:center;color:var(--mut)}
+.doc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .2s}.doc img.ok{opacity:1}
+.doc span{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font-size:10.5px;font-weight:700;padding:14px 6px 5px;z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc.add{border:2px dashed #cbd2e1;background:#fff;flex-direction:column;gap:4px;font-size:12px;font-weight:600}
+.doc.add svg.i{width:26px;height:26px}
+.viewer img{width:100%;border-radius:14px;display:block;background:#eef0f4;min-height:200px}
+.pend{position:absolute;top:5px;right:5px;z-index:2;background:#f59e0b;color:#fff;border-radius:99px;font-size:9px;font-weight:800;padding:2px 6px}
+.file-pick{display:flex;align-items:center;gap:8px;padding:11px 14px;border:1.5px dashed #cbd2e1;border-radius:12px;background:#fff;cursor:pointer;font-size:14px;font-weight:600;color:var(--mut)}
+.auth{position:fixed;inset:0;z-index:50;background:radial-gradient(120% 120% at 100% 0%,#6366f1 0%,#312e81 45%,#0b1220 100%);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}
+.auth.off{display:none}
+.auth-card{background:#fff;border-radius:24px;padding:28px 22px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.35);animation:up .3s ease}
+.auth-logo{width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,#818cf8,#4f46e5);display:grid;place-items:center;color:#fff;margin:0 auto 14px;box-shadow:0 8px 20px rgba(79,70,229,.4)}
+.auth-logo svg.i{width:30px;height:30px}
+.auth h2{justify-content:center;font-size:22px;font-weight:800;text-align:center}
+.auth .sub{text-align:center;color:var(--mut);font-size:13.5px;margin-top:4px}
+.auth .err{color:var(--bad);font-size:13px;font-weight:600;margin-top:12px;min-height:18px;text-align:center}
+.auth .lnk{background:none;border:none;color:var(--pri);font:inherit;font-weight:600;font-size:13px;cursor:pointer;margin-top:12px;width:100%}
+.auth .btn{width:100%;margin-top:16px;height:50px}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.file-pick.ok{border-color:var(--ok);color:var(--ok);border-style:solid}
+@media(max-width:759px){.kpi{flex-direction:column;align-items:flex-start;gap:8px;padding:12px}.kpi .ic{width:34px;height:34px;font-size:16px;border-radius:10px}.kpi b{font-size:15.5px}.kpi small{white-space:normal}
+ #fab{width:58px;height:58px;padding:0;justify-content:center}#fab .t{display:none}#fab span svg.i{width:28px;height:28px}.hero .big{font-size:30px}.hero .sub b{font-size:15px}}
+</style>
+</head>
+<body>
+<div id="auth" class="auth"><div class="auth-card" id="authCard"></div></div>
+<header><div class="hi"><small id="hoyTxt"></small><h1 id="titulo">Hola, Camilo 👋</h1></div><div class="hdr-r"><div id="syncBadge" onclick="syncNow()">● Local</div><button class="x" style="background:#fff;border:1px solid var(--bd)" title="Cerrar sesión" onclick="cerrarSesion()"><span data-i="lock"></span></button></div></header>
+<main>
+  <!-- INICIO -->
+  <section id="v-inicio" class="view on">
+    <div id="hero"></div>
+    <div class="grid" id="kpis"></div>
+    <div class="dash">
+      <div><div class="sect"><h2><span data-i="alert" style="color:var(--bad)"></span> Cobros vencidos</h2><span class="cnt" id="cntV"></span></div><div id="vencidos"></div></div>
+      <div><div class="sect"><h2><span data-i="calendar" style="color:var(--pri)"></span> Próximos 7 días</h2><span class="cnt" id="cntP"></span></div><div id="proximos"></div></div>
+    </div>
+  </section>
+  <!-- PRESTAMOS -->
+  <section id="v-prestamos" class="view">
+    <div class="tools">
+      <input id="q" placeholder="Buscar nombre, teléfono…" oninput="renderPrestamos()">
+      <select id="fPrestador" onchange="renderPrestamos()"></select>
+    </div>
+    <input type="hidden" id="fEstado" value="PENDIENTE">
+    <div class="chips" id="chipsEstado">
+      <button class="chip" data-e="">Todos</button><button class="chip on" data-e="PENDIENTE">Pendientes</button><button class="chip" data-e="VENCIDO">Vencidos</button><button class="chip" data-e="PAGADO">Pagados</button>
+    </div>
+    <div class="mut" id="resumenLista" style="margin:0 2px 10px;font-weight:600"></div>
+    <div id="lista"></div>
+  </section>
+  <!-- CLIENTES -->
+  <section id="v-clientes" class="view">
+    <div class="tools"><input id="qc" placeholder="Buscar cliente…" oninput="renderClientes()"></div>
+    <div id="clientes"></div>
+  </section>
+  <!-- MAS -->
+  <section id="v-mas" class="view">
+    <div class="sect"><h2><span data-i="bank"></span> Capital</h2></div>
+    <div class="card">
+      <label>Capital inicial</label>
+      <div style="display:flex;gap:8px"><input id="capIni" type="number" inputmode="numeric"><button class="btn" onclick="guardarCapital()">Guardar</button></div>
+    </div>
+    <div class="sect"><h2><span data-i="cash"></span> Pagos de interés / retiros</h2><button class="btn sm" onclick="abrirRetiro()"><span data-i="plus"></span> Agregar</button></div>
+    <div id="retiros"></div>
+    <div class="sect"><h2><span data-i="cloud"></span> Cuenta y sincronización</h2></div>
+    <div class="card">
+      <p class="help" id="cuentaInfo"></p>
+      <div class="btns"><button class="btn sec" onclick="syncNow()"><span data-i="cloud"></span> Sincronizar ahora</button><button class="btn sec" onclick="abrirCambioClave()"><span data-i="lock"></span> Cambiar contraseña</button></div>
+      <div class="btns" style="margin-top:8px"><button class="btn bad" onclick="cerrarSesion()"><span data-i="lock"></span> Cerrar sesión</button></div>
+      <p class="help" id="ghStatus" style="margin-top:8px"></p>
+    </div>
+    <div class="sect"><h2><span data-i="download"></span> Copias de seguridad</h2></div>
+    <div class="card btns" style="margin-top:0">
+      <button class="btn sec" onclick="exportJSON()"><span data-i="download"></span> Descargar respaldo (.json)</button>
+      <button class="btn sec" onclick="exportCSV()"><span data-i="sheet"></span> Exportar a Excel (.csv)</button>
+      <button class="btn sec" onclick="document.getElementById('fileIn').click()"><span data-i="upload"></span> Importar respaldo</button>
+      <input type="file" id="fileIn" accept=".json,application/json" hidden onchange="importJSON(event)">
+    </div>
+    <div class="sect"><h2>Zona peligrosa</h2></div>
+    <div class="card"><p class="help" style="margin-bottom:10px">Quita la cuenta y los datos guardados en ESTE dispositivo (lo de GitHub no se borra). Tendrás que configurar otra vez con usuario, repositorio, token y contraseña.</p><button class="btn bad sm" onclick="borrarTodo()">Desconectar este dispositivo</button></div>
+  </section>
+</main>
+
+<button id="fab" onclick="abrirPrestamo()" title="Nuevo préstamo"><span data-i="plus"></span><b class="t">Nuevo préstamo</b></button>
+<nav>
+  <div class="brand"><i data-i="wallet"></i>Préstamos</div>
+  <button data-v="inicio" class="on"><span data-i="home"></span>Inicio</button>
+  <button data-v="prestamos"><span data-i="list"></span>Préstamos</button>
+  <button data-v="clientes"><span data-i="users"></span>Clientes</button>
+  <button data-v="mas"><span data-i="settings"></span>Más</button>
+</nav>
+
+<!-- MODAL -->
+<div class="modal" id="modal" onclick="if(event.target===this)cerrar()"><div class="sheet" id="sheet"></div></div>
+<div id="toast"></div>
+
+<script>
+// ================== ÍCONOS ==================
+const ICONS={
+home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
+list:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',
+users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.8.7 3 2.5 3.5 5.2"/>',
+settings:'<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+wallet:'<path d="M18 7V5a2 2 0 0 0-2-2H6a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h13a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2H6a3 3 0 0 1-3-3"/><circle cx="16.5" cy="13.5" r="1.3"/>',
+bank:'<path d="M3 10 12 4l9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 21h18"/>',
+send:'<path d="M7 17 17 7"/><path d="M8 7h9v9"/>',
+receive:'<path d="M17 7 7 17"/><path d="M16 17H7V8"/>',
+trend:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+cash:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/>',
+clipboard:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M9 11h6M9 15h4"/>',
+alert:'<path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/>',
+calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+camera:'<path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/>',
+phone:'<path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/>',
+chat:'<path d="M21 12a8.5 8.5 0 0 1-12.5 7.5L3 21l1.5-5.5A8.5 8.5 0 1 1 21 12z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/>',
+edit:'<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/>',
+plus:'<path d="M12 5v14M5 12h14"/>',
+userplus:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M19 8v6M16 11h6"/>',
+trash:'<path d="M4 7h16M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+x:'<path d="M6 6l12 12M18 6 6 18"/>',
+cloud:'<path d="M7 18a4 4 0 0 1-.5-8 6 6 0 0 1 11.5 1.5A3.5 3.5 0 0 1 17.5 18H7z"/>',
+download:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+upload:'<path d="M12 16V5M7 10l5-5 5 5M5 20h14"/>',
+sheet:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16M10 3v18"/>',
+image:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',
+file:'<path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8l-5-5z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>',
+clip:'<path d="M20 11.5 12.5 19a5 5 0 0 1-7-7L13 4.5a3.3 3.3 0 0 1 4.7 4.7L10.2 16.7a1.7 1.7 0 0 1-2.4-2.4L14.5 7.6"/>',
+note:'<path d="M5 3h10l4 4v14H5z"/><path d="M15 3v4h4M8 12h8M8 16h5"/>',
+check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+back:'<path d="M15 5l-7 7 7 7"/>',
+lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+key:'<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/>',
+};
+const ic=(n,st='')=>`<svg class="i" viewBox="0 0 24 24" ${st?`style="${st}"`:''}>${ICONS[n]||''}</svg>`;
+function pintarIconos(root=document){root.querySelectorAll('[data-i]').forEach(e=>{if(!e.firstChild)e.innerHTML=ic(e.dataset.i)})}
+// ================== ILUSTRACIONES ==================
+const ILU={
+hero:`<svg class="ilu" viewBox="0 0 160 120" fill="none"><ellipse cx="96" cy="104" rx="56" ry="8" fill="#000" opacity=".15"/>
+<g transform="rotate(-12 70 60)"><rect x="34" y="36" width="80" height="44" rx="7" fill="#34d399"/><rect x="40" y="42" width="68" height="32" rx="4" stroke="#065f46" stroke-opacity=".35" stroke-width="2"/><circle cx="74" cy="58" r="10" fill="#065f46" fill-opacity=".25"/><text x="74" y="63" text-anchor="middle" font-size="13" font-weight="800" fill="#064e3b" font-family="sans-serif">$</text></g>
+<g><ellipse cx="118" cy="96" rx="22" ry="7" fill="#d97706"/><rect x="96" y="84" width="44" height="12" fill="#f59e0b"/><ellipse cx="118" cy="84" rx="22" ry="7" fill="#fbbf24"/>
+<rect x="96" y="72" width="44" height="12" fill="#f59e0b"/><ellipse cx="118" cy="72" rx="22" ry="7" fill="#fcd34d"/><rect x="96" y="60" width="44" height="12" fill="#f59e0b"/><ellipse cx="118" cy="60" rx="22" ry="7" fill="#fde68a"/><text x="118" y="64" text-anchor="middle" font-size="10" font-weight="800" fill="#b45309" font-family="sans-serif">$</text></g>
+<circle cx="30" cy="20" r="3" fill="#fff" opacity=".6"/><circle cx="142" cy="22" r="2" fill="#fff" opacity=".7"/><path d="M146 38l2 4 4 2-4 2-2 4-2-4-4-2 4-2z" fill="#fff" opacity=".8"/></svg>`,
+ok:`<svg class="ill" viewBox="0 0 120 90" fill="none"><ellipse cx="60" cy="82" rx="34" ry="5" fill="#e5e7eb"/><circle cx="60" cy="42" r="30" fill="#d1fae5"/><circle cx="60" cy="42" r="21" fill="#10b981"/><path d="M50 42l7 7 13-14" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 22l2 4 4 2-4 2-2 4-2-4-4-2 4-2z" fill="#fbbf24"/><path d="M100 14l1.5 3 3 1.5-3 1.5-1.5 3-1.5-3-3-1.5 3-1.5z" fill="#818cf8"/><circle cx="102" cy="56" r="3" fill="#f472b6"/></svg>`,
+cal:`<svg class="ill" viewBox="0 0 120 90" fill="none"><ellipse cx="60" cy="82" rx="34" ry="5" fill="#e5e7eb"/><rect x="28" y="16" width="64" height="58" rx="10" fill="#fff" stroke="#c7d2fe" stroke-width="3"/><rect x="28" y="16" width="64" height="16" rx="8" fill="#6366f1"/><rect x="40" y="10" width="5" height="12" rx="2.5" fill="#4338ca"/><rect x="75" y="10" width="5" height="12" rx="2.5" fill="#4338ca"/><g fill="#e0e7ff"><rect x="38" y="40" width="10" height="9" rx="2"/><rect x="55" y="40" width="10" height="9" rx="2"/><rect x="72" y="40" width="10" height="9" rx="2"/><rect x="38" y="55" width="10" height="9" rx="2"/><rect x="72" y="55" width="10" height="9" rx="2"/></g><rect x="55" y="55" width="10" height="9" rx="2" fill="#34d399"/></svg>`,
+vacio:`<svg class="ill" viewBox="0 0 120 90" fill="none"><ellipse cx="60" cy="82" rx="38" ry="5" fill="#e5e7eb"/><path d="M22 34h28l6 7h42v34a4 4 0 0 1-4 4H26a4 4 0 0 1-4-4z" fill="#c7d2fe"/><path d="M22 30a4 4 0 0 1 4-4h20l6 7h40a4 4 0 0 1 4 4v4H22z" fill="#a5b4fc"/><circle cx="84" cy="22" r="11" fill="#fff" stroke="#6366f1" stroke-width="3"/><path d="M92 30l7 7" stroke="#6366f1" stroke-width="4" stroke-linecap="round"/></svg>`,
+docs:`<svg class="ill" viewBox="0 0 120 90" fill="none"><ellipse cx="60" cy="82" rx="36" ry="5" fill="#e5e7eb"/><rect x="34" y="14" width="44" height="58" rx="6" fill="#e0e7ff" transform="rotate(-8 56 43)"/><rect x="42" y="12" width="44" height="58" rx="6" fill="#fff" stroke="#c7d2fe" stroke-width="2.5"/><circle cx="56" cy="30" r="6" fill="#fbbf24"/><path d="M48 58l10-12 8 8 6-6 8 10z" fill="#34d399"/><circle cx="88" cy="66" r="12" fill="#6366f1"/><path d="M88 60v12M82 66h12" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>`
+};
+const vacioHTML=(ilu,txt)=>`<div class="card empty">${ILU[ilu]}${txt}</div>`;
+
+// ================== DATOS ==================
+const LS_DATA='prestamos_data_v1', LS_GH='prestamos_gh_v1';
+const LS_AUTH='prestamos_auth_v2', LS_CACHE='prestamos_cache_v2';
+let DB=vacio();
+let GH=null, KEY=null;
+let ghSha=localStorage.getItem('prestamos_sha')||null;
+let pushTimer=null, syncing=false;
+
+function vacio(){return{version:1,config:{capitalInicial:0},prestamos:[],retiros:[],fotos:{},actualizado:new Date().toISOString()}}
+function fix(d){d=Object.assign(vacio(),d);d.fotos=d.fotos||{};d.retiros=d.retiros||[];d.prestamos.forEach(p=>{p.pagos=p.pagos||[];p.docs=p.docs||[]});return d}
+function cargarLocal(){try{return fix(JSON.parse(localStorage.getItem(LS_DATA))||{})}catch(e){return vacio()}}
+function guardar(push=true){
+  DB.actualizado=new Date().toISOString();
+  guardarLocal();
+  renderTodo();hidratar();
+  if(push&&GH){setBadge('● Guardando…');clearTimeout(pushTimer);pushTimer=setTimeout(pushRemoto,800);}
+}
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+
+// ================== CÁLCULOS (misma lógica del Excel) ==================
+const FREQ={'DIARIO':1,'SEMANAL':7,'QUINCENA':15,'FIN DE MES':30,'MENSUAL':30};
+function calc(p){
+  const interes=p.monto*(+p.tasa||0)/100*(+p.cuotas||1);
+  const total=p.monto+interes;
+  const pagado=(p.pagos||[]).reduce((s,x)=>s+(+x.monto||0),0);
+  const saldo=total-pagado;
+  const nC=Math.max(1,+p.cuotas||1);
+  const valorCuota=total/nC;
+  const cuotasPagadas=Math.min(nC,Math.floor((pagado+1)/valorCuota));
+  let proxima=null;
+  if(saldo>=1&&p.fecha){proxima=fechaCuota(p.fecha,p.frecuencia,cuotasPagadas+1);}
+  const hoy=hoyStr();
+  let estado=saldo<1?'PAGADO':(proxima&&proxima<hoy?'VENCIDO':'PENDIENTE');
+  return{interes,total,pagado,saldo,valorCuota,cuotasPagadas,proxima,estado,avance:Math.min(100,total?pagado/total*100:0)};
+}
+function fechaCuota(inicio,freq,n){
+  const d=new Date(inicio+'T12:00:00');freq=(freq||'').trim().toUpperCase();
+  if(freq==='FIN DE MES'||freq==='MENSUAL'){d.setMonth(d.getMonth()+n);}
+  else d.setDate(d.getDate()+n*(FREQ[freq]||30));
+  return d.toISOString().slice(0,10);
+}
+function hoyStr(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
+function resumen(){
+  let prestado=0,cobrado=0,pendiente=0,interes=0,activos=0,vencidos=0,capPend=0,capAct=0;
+  DB.prestamos.forEach(p=>{const c=calc(p);prestado+=p.monto;cobrado+=c.pagado;interes+=c.interes;if(c.saldo>=1){pendiente+=c.saldo;activos++;capAct+=p.monto;capPend+=p.monto*c.saldo/c.total;if(c.estado==='VENCIDO')vencidos++;}});
+  const retiros=DB.retiros.reduce((s,r)=>s+(+r.monto||0),0);
+  const cap=+DB.config.capitalInicial||0;
+  return{cap,prestado,cobrado,pendiente,interes,activos,vencidos,retiros,capPend,capAct,disponible:cap+cobrado-retiros-prestado,sobrante:prestado-cap};
+}
+
+// ================== FORMATO ==================
+const $=s=>document.querySelector(s);
+const fmt=n=>'$'+Math.round(n||0).toLocaleString('es-CO');
+const fDate=s=>s?new Date(s+'T12:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'}):'—';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const tag=e=>`<span class="tag ${e==='PAGADO'?'t-ok':e==='VENCIDO'?'t-bad':'t-pen'}">${e}</span>`;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2200)}
+const norm=s=>(s||'').toString().trim().toUpperCase().replace(/\s+/g,' ');
+const COLS=['#6366f1','#0ea5e9','#10b981','#f59e0b','#ec4899','#8b5cf6','#14b8a6','#f97316','#ef4444','#3b82f6'];
+const av=(n,cls='')=>{n=norm(n);let h=0;for(const ch of n)h=(h*31+ch.charCodeAt(0))>>>0;const ini=n.split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('')||'?';const f=DB.fotos&&DB.fotos[n];return`<div class="av ${cls}" style="background:${COLS[h%COLS.length]}">${esc(ini)}${f?`<img data-src="${esc(f)}" alt="">`:''}</div>`};
+const telLimpio=t=>{let d=(t||'').replace(/\D/g,'');if(d.length===10)d='57'+d;return d};
+
+// ================== RENDER ==================
+function renderTodo(){renderInicio();renderPrestamos();renderClientes();renderMas();hidratar()}
+function renderInicio(){
+  const r=resumen();
+  $('#hoyTxt').textContent=new Date().toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long'});
+  const meta=r.cobrado+r.pendiente,pct=meta?r.cobrado/meta*100:0;
+  $('#hero').innerHTML=`<div class="hero">${ILU.hero}<small>Disponible para prestar</small><div class="big">${fmt(r.disponible)}</div>
+   <div class="sub"><div><small>Capital en la calle (sin interés)</small><b>${fmt(r.capPend)}</b></div><div><small>Por cobrar (con interés)</small><b>${fmt(r.pendiente)}</b></div></div>
+   <div class="prog"><div class="t"><span>Cobrado ${fmt(r.cobrado)}</span><span>${pct.toFixed(0)}%</span></div><div class="b"><i style="width:${pct}%"></i></div></div></div>`;
+  $('#kpis').innerHTML=[
+    ['bank','c1','Capital inicial',fmt(r.cap)],['send','c5','Total prestado (histórico)',fmt(r.prestado)],['receive','c2','Total cobrado',fmt(r.cobrado)],
+    ['trend','c3','Interés total pactado',fmt(r.interes)],['cash','c4','Retiros / pagos interés',fmt(r.retiros)],
+    ['clipboard','c6','Préstamos activos',`${r.activos} <small style="display:inline;color:var(--bad);font-weight:600">· ${r.vencidos} vencidos</small>`]
+  ].map(([i,c,t,v])=>`<div class="kpi"><div class="ic ${c}">${ic(i)}</div><div style="min-width:0"><small>${t}</small><b>${v}</b></div></div>`).join('');
+  const en7=new Date(Date.now()+7*864e5).toISOString().slice(0,10);
+  const conC=DB.prestamos.map(p=>({p,c:calc(p)}));
+  const venc=conC.filter(x=>x.c.estado==='VENCIDO').sort((a,b)=>a.c.proxima.localeCompare(b.c.proxima));
+  const prox=conC.filter(x=>x.c.estado==='PENDIENTE'&&x.c.proxima&&x.c.proxima<=en7).sort((a,b)=>a.c.proxima.localeCompare(b.c.proxima));
+  const fila=({p,c})=>`<div class="row" onclick="verPrestamo('${p.id}')">${av(p.nombre)}<div class="l"><b>${esc(p.nombre)}</b><small>${c.estado==='VENCIDO'?'Venció':'Vence'} ${fDate(c.proxima)} · cuota ${c.cuotasPagadas+1}/${p.cuotas}</small></div><div class="r"><b>${fmt(Math.min(c.valorCuota,c.saldo))}</b><small class="mut">saldo ${fmt(c.saldo)}</small></div></div>`;
+  $('#cntV').textContent=venc.length?venc.length+' · '+fmt(venc.reduce((s,x)=>s+Math.min(x.c.valorCuota,x.c.saldo),0)):'';
+  $('#cntP').textContent=prox.length?prox.length+' · '+fmt(prox.reduce((s,x)=>s+Math.min(x.c.valorCuota,x.c.saldo),0)):'';
+  $('#vencidos').innerHTML=venc.length?`<div class="list">${venc.map(fila).join('')}</div>`:vacioHTML('ok','Sin cobros vencidos');
+  $('#proximos').innerHTML=prox.length?`<div class="list">${prox.map(fila).join('')}</div>`:vacioHTML('cal','Nada para los próximos 7 días');
+}
+function renderPrestamos(){
+  const sel=$('#fPrestador'),cur=sel.value;
+  const prest=[...new Set(DB.prestamos.map(p=>norm(p.prestador)).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">Todos los prestadores</option>'+prest.map(x=>`<option ${x===cur?'selected':''}>${esc(x)}</option>`).join('');
+  const q=norm($('#q').value),fe=$('#fEstado').value,fp=sel.value;
+  let L=DB.prestamos.map(p=>({p,c:calc(p)})).filter(({p,c})=>{
+    if(q&&!(norm(p.nombre).includes(q)||(p.telefono||'').replace(/\D/g,'').includes(q.replace(/\D/g,'')||'§')))return false;
+    if(fe==='PENDIENTE'&&c.estado==='PAGADO')return false;
+    if(fe&&fe!=='PENDIENTE'&&c.estado!==fe)return false;
+    if(fp&&norm(p.prestador)!==fp)return false;return true;
+  }).sort((a,b)=>(b.p.fecha||'').localeCompare(a.p.fecha||''));
+  const tot=L.reduce((s,x)=>s+Math.max(0,x.c.saldo),0);
+  $('#resumenLista').textContent=`${L.length} préstamo(s) · saldo ${fmt(tot)}`;
+  $('#lista').innerHTML=L.length?`<div class="list">${L.map(({p,c})=>`<div class="row" onclick="verPrestamo('${p.id}')">${av(p.nombre)}<div class="l"><b>${esc(p.nombre)}</b><small>${fmt(p.monto)} · ${fDate(p.fecha)} · ${p.cuotas} cuota(s)${(p.docs||[]).length?' · '+ic('clip')+' '+p.docs.length:''}</small><div class="mini"><i style="width:${c.avance}%"></i></div></div><div class="r"><b>${fmt(c.saldo)}</b>${tag(c.estado)}</div></div>`).join('')}</div>`:vacioHTML('vacio','No hay préstamos con ese filtro');
+}
+function renderClientes(){
+  const q=norm($('#qc').value);const g={};
+  DB.prestamos.forEach(p=>{const k=norm(p.nombre);const c=calc(p);(g[k]=g[k]||{n:k,tel:'',num:0,activos:0,prestado:0,saldo:0});const o=g[k];o.num++;o.prestado+=p.monto;if(c.saldo>=1){o.activos++;o.saldo+=c.saldo}if(p.telefono)o.tel=p.telefono;});
+  const L=Object.values(g).filter(o=>!q||o.n.includes(q)).sort((a,b)=>b.saldo-a.saldo||a.n.localeCompare(b.n));
+  $('#clientes').innerHTML=L.length?`<div class="list">${L.map(o=>`<div class="row" onclick="verCliente('${esc(o.n)}')">${av(o.n)}<div class="l"><b>${esc(o.n)}</b><small>${o.num} préstamo(s) · ${o.activos} activo(s)${o.tel?' · '+esc(o.tel):''}</small></div><div class="r"><b style="color:${o.saldo>=1?'var(--bad)':'var(--ok)'}">${fmt(o.saldo)}</b><small class="mut">${o.saldo>=1?'debe':'al día'}</small></div></div>`).join('')}</div>`:vacioHTML('vacio','Sin clientes');
+}
+function renderMas(){
+  $('#capIni').value=DB.config.capitalInicial||0;
+  const R=[...DB.retiros].sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
+  const porP={};R.forEach(r=>porP[norm(r.persona)]=(porP[norm(r.persona)]||0)+(+r.monto));
+  $('#retiros').innerHTML=(Object.keys(porP).length?`<div class="card"><table>${Object.entries(porP).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="n"><b>${fmt(v)}</b></td></tr>`).join('')}</table></div>`:'')+
+    (R.length?`<div class="list">${R.map(r=>`<div class="row" onclick="abrirRetiro('${r.id}')">${av(r.persona)}<div class="l"><b>${esc(r.persona)}</b><small>${fDate(r.fecha)} ${esc(r.nota||'')}</small></div><div class="r"><b>${fmt(r.monto)}</b></div></div>`).join('')}</div>`:vacioHTML('vacio','Sin retiros registrados'));
+  if(GH)$('#cuentaInfo').innerHTML=`Conectado a <b>${esc(GH.user)}/${esc(GH.repo)}</b>. Datos en <code>datos.json</code>, fotos en <code>fotos/</code> y la huella de la contraseña en <code>auth.json</code> (repositorio privado).`;
+}
+
+// ================== MODALES ==================
+function abrir(html){const s=$('#sheet');s.innerHTML=html;pintarIconos(s);hidratar(s);$('#modal').classList.add('on')}
+function cerrar(){$('#modal').classList.remove('on')}
+const val=id=>document.getElementById(id).value;
+
+function abrirPrestamo(id,base){
+  const p=id?DB.prestamos.find(x=>x.id===id):Object.assign({nombre:'',telefono:'',direccion:'',monto:'',frecuencia:'FIN DE MES',fecha:hoyStr(),tasa:10,cuotas:1,prestador:'CAMILO',obs:''},base||{});
+  const fr=['QUINCENA','FIN DE MES','SEMANAL','DIARIO'];if(p.frecuencia&&!fr.includes(norm(p.frecuencia)))fr.push(norm(p.frecuencia));
+  abrir(`<h3>${id?'Editar':'Nuevo'} préstamo<button class="x" onclick="cerrar()">${ic('x','width:18px;height:18px')}</button></h3>
+  <label>Nombre completo *</label><input id="f_nombre" value="${esc(p.nombre)}" list="dlNombres" autocomplete="off" oninput="autoCliente()">
+  <datalist id="dlNombres">${[...new Set(DB.prestamos.map(x=>norm(x.nombre)))].map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
+  <div class="row2"><div><label>Teléfono</label><input id="f_tel" type="tel" value="${esc(p.telefono)}"></div><div><label>Dirección / ciudad</label><input id="f_dir" value="${esc(p.direccion)}"></div></div>
+  <div class="row2"><div><label>Monto prestado *</label><input id="f_monto" type="number" inputmode="numeric" value="${p.monto}" oninput="prev()"></div><div><label>Fecha</label><input id="f_fecha" type="date" value="${p.fecha||''}" oninput="prev()"></div></div>
+  <div class="row2"><div><label>Pagos por fecha</label><select id="f_freq">${fr.map(f=>`<option ${norm(p.frecuencia)===f?'selected':''}>${f}</option>`).join('')}</select></div><div><label>N° de cuotas</label><input id="f_cuotas" type="number" inputmode="numeric" min="1" value="${p.cuotas}" oninput="prev()"></div></div>
+  <div class="row2"><div><label>Interés % por cuota</label><input id="f_tasa" type="number" inputmode="decimal" step="0.5" value="${p.tasa}" oninput="prev()"></div><div><label>Prestador</label><input id="f_prest" value="${esc(p.prestador)}" list="dlPrest"></div></div>
+  <datalist id="dlPrest">${[...new Set(DB.prestamos.map(x=>norm(x.prestador)).filter(Boolean))].map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
+  <label>Observaciones</label><textarea id="f_obs" rows="2">${esc(p.obs)}</textarea>
+  <div class="soft" style="margin-top:12px" id="preview"></div>
+  <div class="btns">${id?`<button class="btn bad" onclick="eliminarPrestamo('${id}')">Eliminar</button>`:''}<button class="btn" onclick="guardarPrestamo('${id||''}')">Guardar</button></div>`);
+  prev();
+}
+function autoCliente(){const n=norm(val('f_nombre'));const p=[...DB.prestamos].reverse().find(x=>norm(x.nombre)===n);if(p){if(!val('f_tel'))document.getElementById('f_tel').value=p.telefono||'';if(!val('f_dir'))document.getElementById('f_dir').value=p.direccion||'';}}
+function prev(){const p={monto:+val('f_monto')||0,tasa:+val('f_tasa')||0,cuotas:+val('f_cuotas')||1,pagos:[]};const c=calc(p);
+  $('#preview').innerHTML=`<dl class="dl" style="margin:0"><dt>Valor interés</dt><dd>${fmt(c.interes)}</dd><dt>Valor a pagar</dt><dd>${fmt(c.total)}</dd><dt>Valor de cada cuota</dt><dd>${fmt(c.valorCuota)}</dd></dl>`}
+function guardarPrestamo(id){
+  const nombre=norm(val('f_nombre')),monto=+val('f_monto');
+  if(!nombre||!monto){toast('Nombre y monto son obligatorios');return}
+  const d={nombre,telefono:val('f_tel').trim(),direccion:val('f_dir').trim().toUpperCase(),monto,fecha:val('f_fecha'),frecuencia:val('f_freq'),cuotas:Math.max(1,parseInt(val('f_cuotas'))||1),tasa:+val('f_tasa')||0,prestador:norm(val('f_prest')),obs:val('f_obs').trim()};
+  if(id)Object.assign(DB.prestamos.find(x=>x.id===id),d);else DB.prestamos.push(Object.assign({id:uid(),pagos:[],creado:new Date().toISOString()},d));
+  guardar();cerrar();toast('Préstamo guardado ✅');if(id)verPrestamo(id);
+}
+function eliminarPrestamo(id){if(!confirm('¿Eliminar este préstamo y todos sus pagos?'))return;(DB.prestamos.find(x=>x.id===id).docs||[]).forEach(d=>borrarFoto(d.path));DB.prestamos=DB.prestamos.filter(x=>x.id!==id);guardar();cerrar();toast('Préstamo eliminado')}
+
+function verPrestamo(id){
+  const p=DB.prestamos.find(x=>x.id===id);if(!p)return;const c=calc(p);const tel=telLimpio(p.telefono);
+  const msg=encodeURIComponent(`Hola ${p.nombre.split(' ')[0]}, te recuerdo el pago de tu cuota ${Math.min(c.cuotasPagadas+1,p.cuotas)}/${p.cuotas} por ${fmt(Math.min(c.valorCuota,c.saldo))}${c.proxima?' con fecha '+fDate(c.proxima):''}. Saldo pendiente: ${fmt(c.saldo)}. ¡Gracias!`);
+  abrir(`<h3><span style="display:flex;align-items:center;gap:10px"><span class="avwrap" onclick="verCliente('${esc(norm(p.nombre))}')">${av(p.nombre)}</span>${esc(p.nombre)}</span><button class="x" onclick="cerrar()">${ic('x','width:18px;height:18px')}</button></h3>
+  <div>${tag(c.estado)} <span class="mut">${esc(p.telefono||'')} ${p.direccion?'· '+esc(p.direccion):''}</span></div>
+  <div class="bar" style="margin-top:10px"><i style="width:${c.avance}%"></i></div>
+  <dl class="dl"><dt>Prestado</dt><dd>${fmt(p.monto)}</dd><dt>Fecha</dt><dd>${fDate(p.fecha)}</dd><dt>Pagos</dt><dd>${esc(p.frecuencia||'—')} · ${p.cuotas} cuota(s)</dd>
+  <dt>Interés (${p.tasa}% × ${p.cuotas})</dt><dd>${fmt(c.interes)}</dd><dt>Valor a pagar</dt><dd>${fmt(c.total)}</dd><dt>Valor cuota</dt><dd>${fmt(c.valorCuota)}</dd>
+  <dt>Pagado</dt><dd style="color:var(--ok)">${fmt(c.pagado)}</dd><dt>Saldo pendiente</dt><dd style="color:${c.saldo>=1?'var(--bad)':'var(--ok)'}">${fmt(c.saldo)}</dd>
+  ${c.proxima?`<dt>Próxima cuota</dt><dd>${fDate(c.proxima)}</dd>`:''}<dt>Prestador</dt><dd>${esc(p.prestador||'—')}</dd></dl>
+  ${p.obs?`<p class="mut" style="margin-bottom:8px">${ic('note')} ${esc(p.obs)}</p>`:''}
+  <h2 style="margin:16px 0 8px">${ic('file')} Documentos (${(p.docs||[]).length})</h2>
+  <div class="docs">${(p.docs||[]).map(d=>`<div class="doc" onclick="verDoc('${p.id}','${d.id}')">${ic('image','width:28px;height:28px')}<img data-src="${esc(d.path)}" alt=""><span>${esc(d.tipo)}</span></div>`).join('')}
+   <label class="doc add" style="margin:0">${ic('camera')}Agregar foto<input type="file" accept="image/*" hidden onchange="pedirTipoDoc('${p.id}',this)"></label></div>
+  <h2 style="margin:16px 0 6px">Pagos (${(p.pagos||[]).length})</h2>
+  ${(p.pagos||[]).length?`<table><tr><th>#</th><th>Fecha</th><th class="n">Valor</th><th></th></tr>${p.pagos.map((x,i)=>`<tr><td>${i+1}</td><td>${fDate(x.fecha)}${x.nota?`<br><small class="mut">${esc(x.nota)}</small>`:''}</td><td class="n">${fmt(x.monto)}</td><td class="n" style="white-space:nowrap">${(p.docs||[]).find(d=>d.pagoId===x.id)?`<button class="btn sec sm" onclick="verDoc('${p.id}','${p.docs.find(d=>d.pagoId===x.id).id}')">${ic('clip')}</button> `:''}<button class="btn sec sm" onclick="borrarPago('${p.id}','${x.id}')">${ic('trash')}</button></td></tr>`).join('')}</table>`:'<div class="mut">Aún no hay pagos</div>'}
+  ${c.saldo>=1?`<div class="soft" style="margin-top:12px"><div class="row2"><div><label style="margin-top:0">Valor del pago</label><input id="pg_monto" type="number" inputmode="numeric" value="${Math.round(Math.min(c.valorCuota,c.saldo))}"></div><div><label style="margin-top:0">Fecha</label><input id="pg_fecha" type="date" value="${hoyStr()}"></div></div><label>Nota (opcional)</label><input id="pg_nota"><label>Foto del comprobante (opcional)</label><label class="file-pick" id="pg_fl">${ic('camera')}<span>Tomar o elegir foto</span><input type="file" id="pg_foto" accept="image/*" hidden onchange="this.parentNode.classList.add('ok');this.parentNode.querySelector('span').textContent='Foto lista ✓'"></label><div class="btns"><button class="btn" onclick="registrarPago('${p.id}')">${ic('cash')} Registrar pago</button><button class="btn sec" onclick="document.getElementById('pg_monto').value=${Math.round(c.saldo)}">Saldo total</button></div></div>`:''}
+  <div class="btns">${tel?`<a class="btn wa" target="_blank" href="https://wa.me/${tel}?text=${msg}">${ic('chat')} WhatsApp</a><a class="btn sec" href="tel:${esc(p.telefono)}">${ic('phone')} Llamar</a>`:''}
+  <button class="btn sec" onclick="abrirPrestamo('${p.id}')">${ic('edit')} Editar</button><button class="btn sec" onclick="nuevoACliente('${p.id}')">${ic('userplus')} Nuevo a este cliente</button></div>`);
+}
+function nuevoACliente(id){const p=DB.prestamos.find(x=>x.id===id);abrirPrestamo(null,{nombre:p.nombre,telefono:p.telefono,direccion:p.direccion,frecuencia:p.frecuencia,prestador:p.prestador})}
+async function registrarPago(id){
+  const m=+val('pg_monto');if(!m||m<=0){toast('Valor inválido');return}
+  const p=DB.prestamos.find(x=>x.id===id);const pago={id:uid(),fecha:val('pg_fecha'),monto:m,nota:val('pg_nota').trim()};(p.pagos=p.pagos||[]).push(pago);
+  const f=document.getElementById('pg_foto').files[0];
+  if(f){toast('Guardando foto…');try{const path=await guardarFoto(f,'docs',1400);(p.docs=p.docs||[]).push({id:uid(),path,tipo:'Comprobante de pago',fecha:pago.fecha,pagoId:pago.id,nota:fmt(m)})}catch(e){toast('No se pudo guardar la foto')}}
+  guardar();toast('Pago registrado ✅');verPrestamo(id);
+}
+function borrarPago(pid,id){if(!confirm('¿Eliminar este pago?'))return;const p=DB.prestamos.find(x=>x.id===pid);p.pagos=p.pagos.filter(x=>x.id!==id);(p.docs||[]).filter(d=>d.pagoId===id).forEach(d=>borrarFoto(d.path));p.docs=(p.docs||[]).filter(d=>d.pagoId!==id);guardar();verPrestamo(pid)}
+
+function verCliente(n){
+  const L=DB.prestamos.filter(p=>norm(p.nombre)===n).map(p=>({p,c:calc(p)})).sort((a,b)=>(b.p.fecha||'').localeCompare(a.p.fecha||''));
+  const saldo=L.reduce((s,x)=>s+Math.max(0,x.c.saldo),0),pag=L.reduce((s,x)=>s+x.c.pagado,0),pre=L.reduce((s,x)=>s+x.p.monto,0);
+  abrir(`<h3><span></span><button class="x" onclick="cerrar()">${ic('x','width:18px;height:18px')}</button></h3>
+  <div class="cli-head"><label class="avwrap">${av(n,'xl')}<span class="cam">${ic('camera','width:15px;height:15px')}</span><input type="file" accept="image/*" hidden onchange="cambiarFotoCliente('${esc(n)}',this)"></label>
+   <div><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">${esc(n)}</div><div class="mut">${esc((L.find(x=>x.p.telefono)||{p:{}}).p.telefono||'')}</div>${DB.fotos[n]?`<button class="btn sec sm" style="margin-top:6px" onclick="quitarFotoCliente('${esc(n)}')">Quitar foto</button>`:'<div class="mut" style="font-size:12px;margin-top:4px">Toca el círculo para poner su foto</div>'}</div></div>
+  <dl class="dl"><dt>Total prestado</dt><dd>${fmt(pre)}</dd><dt>Total pagado</dt><dd style="color:var(--ok)">${fmt(pag)}</dd><dt>Debe actualmente</dt><dd style="color:var(--bad)">${fmt(saldo)}</dd></dl>
+  <div class="list">${L.map(({p,c})=>`<div class="row" onclick="verPrestamo('${p.id}')"><div class="l"><b>${fmt(p.monto)}</b><small>${fDate(p.fecha)} · ${p.cuotas} cuota(s)</small><div class="mini"><i style="width:${c.avance}%"></i></div></div><div class="r"><b>${fmt(c.saldo)}</b>${tag(c.estado)}</div></div>`).join('')}</div>`);
+}
+
+function abrirRetiro(id){
+  const r=id?DB.retiros.find(x=>x.id===id):{persona:'',monto:'',fecha:hoyStr(),nota:''};
+  abrir(`<h3>${id?'Editar':'Nuevo'} pago de interés / retiro<button class="x" onclick="cerrar()">${ic('x','width:18px;height:18px')}</button></h3>
+  <p class="help">Dinero que sale de la caja (ej. intereses pagados a un socio). Se descuenta del disponible.</p>
+  <label>Persona</label><input id="r_p" value="${esc(r.persona)}" list="dlPrest2"><datalist id="dlPrest2">${[...new Set([...DB.retiros.map(x=>norm(x.persona)),...DB.prestamos.map(x=>norm(x.prestador))].filter(Boolean))].map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
+  <div class="row2"><div><label>Valor</label><input id="r_m" type="number" inputmode="numeric" value="${r.monto}"></div><div><label>Fecha</label><input id="r_f" type="date" value="${r.fecha||''}"></div></div>
+  <label>Nota</label><input id="r_n" value="${esc(r.nota)}">
+  <div class="btns">${id?`<button class="btn bad" onclick="borrarRetiro('${id}')">Eliminar</button>`:''}<button class="btn" onclick="guardarRetiro('${id||''}')">Guardar</button></div>`);
+}
+function guardarRetiro(id){const d={persona:norm(val('r_p')),monto:+val('r_m'),fecha:val('r_f'),nota:val('r_n').trim()};if(!d.persona||!d.monto){toast('Persona y valor son obligatorios');return}
+  if(id)Object.assign(DB.retiros.find(x=>x.id===id),d);else DB.retiros.push(Object.assign({id:uid()},d));guardar();cerrar();toast('Guardado ✅')}
+function borrarRetiro(id){if(!confirm('¿Eliminar?'))return;DB.retiros=DB.retiros.filter(x=>x.id!==id);guardar();cerrar()}
+function guardarCapital(){DB.config.capitalInicial=+$('#capIni').value||0;guardar();toast('Capital actualizado')}
+
+// ================== RESPALDOS ==================
+function descargar(nombre,contenido,tipo){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([contenido],{type:tipo}));a.download=nombre;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function exportJSON(){descargar(`prestamos_respaldo_${hoyStr()}.json`,JSON.stringify(DB,null,1),'application/json')}
+function exportCSV(){
+  const maxP=Math.max(12,...DB.prestamos.map(p=>(p.pagos||[]).length));
+  const h=['NOMBRE','TELEFONO','DIRECCION','TOTAL_PRESTAMO','PAGOS POR FECHA','FECHA','INTERES %','VALOR INTERES','VALOR A PAGAR',...Array.from({length:maxP},(_,i)=>'CUOTA#'+(i+1)),'TOTAL PAGADO','SALDO PENDIENTE','ESTADO','PRESTADOR','N CUOTAS','VALOR CUOTA','OBSERVACIONES'];
+  const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+  const rows=DB.prestamos.map(p=>{const c=calc(p);const pg=(p.pagos||[]).map(x=>x.monto);return[p.nombre,p.telefono,p.direccion,p.monto,p.frecuencia,p.fecha,p.tasa,Math.round(c.interes),Math.round(c.total),...Array.from({length:maxP},(_,i)=>pg[i]??''),c.pagado,Math.round(c.saldo),c.estado,p.prestador,p.cuotas,Math.round(c.valorCuota),p.obs]});
+  descargar(`prestamos_${hoyStr()}.csv`,'﻿'+[h,...rows].map(r=>r.map(q).join(';')).join('\r\n'),'text/csv;charset=utf-8');
+}
+function importJSON(e){
+  const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=()=>{try{const d=JSON.parse(rd.result);if(!Array.isArray(d.prestamos))throw 0;
+    if(DB.prestamos.length&&!confirm(`Esto REEMPLAZA los datos actuales (${DB.prestamos.length} préstamos) por los del archivo (${d.prestamos.length}). ¿Continuar?`))return;
+    DB=fix(d);guardar();toast(`Importados ${DB.prestamos.length} préstamos ✅`)}catch(_){toast('Archivo no válido')}};
+  rd.readAsText(f);e.target.value='';
+}
+function borrarTodo(){if(!confirm('¿Desconectar este dispositivo? Se borran la cuenta y los datos guardados aquí (lo de GitHub no se borra).'))return;[LS_AUTH,LS_CACHE,LS_DATA,LS_GH,'prestamos_sha'].forEach(k=>localStorage.removeItem(k));try{indexedDB.deleteDatabase('prestamos_img')}catch(e){};IMGDB=null;cerrarSesion(true);mostrarAuth('setup')}
+
+// ================== SINCRONIZACIÓN GITHUB ==================
+const b64e=s=>{const b=new TextEncoder().encode(s);let r='';for(let i=0;i<b.length;i+=0x8000)r+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(r)};
+const b64d=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\n/g,'')),c=>c.charCodeAt(0)));
+function setBadge(t){$('#syncBadge').textContent=t}
+function apiUrl(path='datos.json'){return`https://api.github.com/repos/${encodeURIComponent(GH.user)}/${encodeURIComponent(GH.repo)}/contents/${path}`}
+async function gh(method,body,path){
+  const r=await fetch(apiUrl(path)+(method==='GET'?'?t='+Date.now():''),{method,headers:{'Authorization':'Bearer '+GH.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},body:body?JSON.stringify(body):undefined,cache:'no-store'});
+  return r;
+}
+async function pullRemoto(silencioso){
+  const r=await gh('GET');
+  if(r.status===404)return{nuevo:true};
+  if(!r.ok)throw new Error(r.status===401?'Token inválido o vencido':r.status===403?'El token no tiene permiso sobre ese repositorio':'Error '+r.status);
+  const j=await r.json();return{data:JSON.parse(b64d(j.content)),sha:j.sha};
+}
+async function pushRemoto(){
+  if(!GH||syncing)return;syncing=true;
+  try{
+    const body={message:'Actualización '+new Date().toLocaleString('es-CO'),content:b64e(JSON.stringify(DB))};if(ghSha)body.sha=ghSha;
+    let r=await gh('PUT',body);
+    if(r.status===409||r.status===422){ // otro dispositivo guardó antes
+      const rem=await pullRemoto();
+      if(rem.data&&rem.data.actualizado>DB.actualizado){DB=fix(rem.data);ghSha=rem.sha;guardarSha();guardarLocal();renderTodo();toast('Había cambios más recientes en otro dispositivo; se cargaron. Repite tu último cambio.');setBadge('✓ Sincronizado');return}
+      body.sha=rem.sha;r=await gh('PUT',body);
+    }
+    if(!r.ok)throw new Error('Error '+r.status);
+    ghSha=(await r.json()).content.sha;guardarSha();setBadge('✓ Sincronizado');
+  }catch(e){setBadge('⚠ Sin sincronizar');console.error(e)}
+  finally{syncing=false}
+}
+function guardarSha(){localStorage.setItem('prestamos_sha',ghSha||'')}
+async function syncNow(){
+  if(!GH||!KEY)return;
+  setBadge('● Sincronizando…');
+  try{
+    const rem=await pullRemoto();
+    if(rem.nuevo){ghSha=null;await pushRemoto();$('#ghStatus').textContent='Archivo datos.json creado en tu repositorio ✅';return}
+    ghSha=rem.sha;guardarSha();
+    if(!DB.prestamos.length||rem.data.actualizado>=DB.actualizado){DB=fix(rem.data);guardarLocal();renderTodo();setBadge('✓ Sincronizado')}
+    else await pushRemoto();
+    $('#ghStatus').textContent='Última sincronización: '+new Date().toLocaleString('es-CO');subirPendientes();hidratar();
+  }catch(e){setBadge('⚠ Error');$('#ghStatus').textContent='❌ '+e.message;toast(e.message)}
+}
+
+
+// ================== FOTOS ==================
+// Se guardan comprimidas en este dispositivo (IndexedDB) y se suben a fotos/ en el repo privado.
+let IMGDB=null,URLS={},CARGANDO={};
+function idbOpen(){return IMGDB||(IMGDB=new Promise((res,rej)=>{const r=indexedDB.open('prestamos_img',1);r.onupgradeneeded=()=>{r.result.createObjectStore('img');r.result.createObjectStore('pend')};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}))}
+async function idb(store,mode,fn){const db=await idbOpen();return new Promise((res,rej)=>{const tx=db.transaction(store,mode);const q=fn(tx.objectStore(store));tx.oncomplete=()=>res(q&&q.result);tx.onerror=()=>rej(tx.error)})}
+const idbGet=(s,k)=>idb(s,'readonly',o=>o.get(k)),idbSet=(s,k,v)=>idb(s,'readwrite',o=>o.put(v,k)),idbDel=(s,k)=>idb(s,'readwrite',o=>o.delete(k)),idbKeys=s=>idb(s,'readonly',o=>o.getAllKeys());
+function comprimir(file,max,cuadrada){return new Promise((res,rej)=>{const img=new Image();const u=URL.createObjectURL(file);img.onload=()=>{URL.revokeObjectURL(u);let w=img.naturalWidth,h=img.naturalHeight,sx=0,sy=0,sw=w,sh=h;
+  if(cuadrada){const m=Math.min(w,h);sx=(w-m)/2;sy=(h-m)/2;sw=sh=m;w=h=Math.min(m,max)}else{const k=Math.min(1,max/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k)}
+  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(img,sx,sy,sw,sh,0,0,w,h);c.toBlob(b=>b?res(b):rej(new Error('No se pudo procesar')),'image/jpeg',.78)};img.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('Imagen no válida'))};img.src=u})}
+const blobB64=b=>new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(',')[1]);fr.readAsDataURL(b)});
+async function guardarFoto(file,carpeta,max,cuadrada){
+  const blob=await comprimir(file,max,cuadrada);const path=`fotos/${carpeta}/${uid()}.jpg`;
+  await idbSet('img',path,await cifrarBuf(new Uint8Array(await blob.arrayBuffer())));await idbSet('pend',path,1);URLS[path]=URL.createObjectURL(blob);subirPendientes();return path;
+}
+let subiendo=false;
+async function subirPendientes(){
+  if(!GH||subiendo)return;subiendo=true;
+  try{for(const path of await idbKeys('pend')){const b=await leerImgLocal(path);if(!b){await idbDel('pend',path);continue}
+    const r=await gh('PUT',{message:'Foto '+path,content:await blobB64(b)},path);
+    if(r.ok||r.status===422)await idbDel('pend',path);else break}}
+  catch(e){console.error(e)}finally{subiendo=false;document.querySelectorAll('.pend').forEach(async e=>{if(!(await idbGet('pend',e.dataset.p)))e.remove()})}
+}
+async function urlFoto(path){
+  if(URLS[path])return URLS[path];if(CARGANDO[path])return CARGANDO[path];
+  return CARGANDO[path]=(async()=>{let b=await leerImgLocal(path).catch(()=>null);
+    if(!b&&GH){const r=await gh('GET',null,path);if(r.ok){const j=await r.json();if(j.content){const bin=atob(j.content.replace(/\n/g,''));const u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);b=new Blob([u8],{type:'image/jpeg'});if(KEY)idbSet('img',path,await cifrarBuf(u8))}}}
+    delete CARGANDO[path];if(!b)return null;return URLS[path]=URL.createObjectURL(b)})();
+}
+function hidratar(root=document){root.querySelectorAll('img[data-src]:not([src])').forEach(async im=>{const u=await urlFoto(im.dataset.src).catch(()=>null);if(u){im.onload=()=>im.classList.add('ok');im.src=u}})}
+async function borrarFoto(path){
+  if(!path)return;await idbDel('img',path).catch(()=>{});await idbDel('pend',path).catch(()=>{});delete URLS[path];
+  if(GH){try{const r=await gh('GET',null,path);if(r.ok){const j=await r.json();await gh('DELETE',{message:'Borrar '+path,sha:j.sha},path)}}catch(e){}}
+}
+async function cambiarFotoCliente(n,inp){
+  const f=inp.files[0];if(!f)return;toast('Guardando foto…');
+  try{const old=DB.fotos[n];DB.fotos[n]=await guardarFoto(f,'clientes',320,true);if(old)borrarFoto(old);guardar();verCliente(n);toast('Foto actualizada ✅')}catch(e){toast(e.message)}
+}
+function quitarFotoCliente(n){if(!confirm('¿Quitar la foto de '+n+'?'))return;borrarFoto(DB.fotos[n]);delete DB.fotos[n];guardar();verCliente(n)}
+const TIPOS_DOC=['Cédula','Pagaré / Letra','Comprobante de pago','Contrato','Otro'];
+let fotoTemp=null;
+function pedirTipoDoc(pid,inp){
+  fotoTemp=inp.files[0];if(!fotoTemp)return;
+  abrir(`<h3>Tipo de documento<button class="x" onclick="verPrestamo('${pid}')">${ic('x','width:18px;height:18px')}</button></h3>
+  <p class="help">¿Qué es esta foto?</p>
+  <div style="display:grid;gap:8px;margin-top:12px">${TIPOS_DOC.map(t=>`<button class="btn sec" style="justify-content:flex-start" onclick="agregarDoc('${pid}','${t}')">${ic(t==='Cédula'?'users':t==='Comprobante de pago'?'cash':'file')} ${t}</button>`).join('')}</div>`);
+}
+async function agregarDoc(pid,tipo){
+  const p=DB.prestamos.find(x=>x.id===pid);if(!fotoTemp)return;toast('Guardando foto…');
+  try{const path=await guardarFoto(fotoTemp,'docs',1400);(p.docs=p.docs||[]).push({id:uid(),path,tipo,fecha:hoyStr()});fotoTemp=null;guardar();toast('Documento guardado ✅')}catch(e){toast(e.message)}
+  verPrestamo(pid);
+}
+async function verDoc(pid,did){
+  const p=DB.prestamos.find(x=>x.id===pid),d=(p.docs||[]).find(x=>x.id===did);if(!d)return;
+  const pend=await idbGet('pend',d.path).catch(()=>null);
+  abrir(`<h3><span style="display:flex;align-items:center;gap:8px"><button class="x" onclick="verPrestamo('${pid}')">${ic('back','width:18px;height:18px')}</button>${esc(d.tipo)}</span><button class="x" onclick="cerrar()">${ic('x','width:18px;height:18px')}</button></h3>
+  <p class="mut" style="margin-bottom:10px">${esc(p.nombre)} · ${fDate(d.fecha)}${d.nota?' · '+esc(d.nota):''}${pend?' · <b style="color:var(--warn)">pendiente por subir</b>':''}</p>
+  <div class="viewer"><img data-src="${esc(d.path)}" alt="${esc(d.tipo)}"></div>
+  <div class="btns"><button class="btn sec" onclick="descargarFoto('${esc(d.path)}','${esc(norm(p.nombre).replace(/\s+/g,'_'))}_${esc(d.tipo.replace(/\W+/g,'_'))}.jpg')">${ic('download')} Descargar</button><button class="btn bad" onclick="borrarDoc('${pid}','${did}')">${ic('trash')} Eliminar</button></div>`);
+}
+async function descargarFoto(path,nombre){const u=await urlFoto(path);if(!u)return toast('No disponible');const a=document.createElement('a');a.href=u;a.download=nombre;a.click()}
+function borrarDoc(pid,did){if(!confirm('¿Eliminar esta foto?'))return;const p=DB.prestamos.find(x=>x.id===pid);const d=p.docs.find(x=>x.id===did);borrarFoto(d.path);p.docs=p.docs.filter(x=>x.id!==did);guardar();verPrestamo(pid)}
+
+// ================== SEGURIDAD / INICIO DE SESIÓN ==================
+// La contraseña NUNCA se guarda: en auth.json (repo privado) queda solo una huella PBKDF2.
+// En cada dispositivo el token y los datos quedan cifrados (AES-GCM) con una llave derivada de la contraseña.
+const TE=new TextEncoder(),TD=new TextDecoder();
+const u8b64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
+const b64u8=s=>{const b=atob(s);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u};
+async function derivar(pass,salt,iter){
+  const base=await crypto.subtle.importKey('raw',TE.encode(pass),'PBKDF2',false,['deriveBits']);
+  const bits=new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',salt:b64u8(salt),iterations:iter,hash:'SHA-256'},base,512));
+  return{key:await crypto.subtle.importKey('raw',bits.slice(0,32),'AES-GCM',false,['encrypt','decrypt']),verif:u8b64(bits.slice(32))};
+}
+async function cifrar(u8,key=KEY){const iv=crypto.getRandomValues(new Uint8Array(12));return{iv:u8b64(iv),ct:u8b64(new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,u8)))}}
+async function descifrar(o,key=KEY){return new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64u8(o.iv)},key,b64u8(o.ct)))}
+async function cifrarBuf(u8){const iv=crypto.getRandomValues(new Uint8Array(12));return{iv,ct:await crypto.subtle.encrypt({name:'AES-GCM',iv},KEY,u8)}}
+async function leerImgLocal(path){const v=await idbGet('img',path);if(!v)return null;if(v instanceof Blob)return v;if(!KEY)return null;return new Blob([await crypto.subtle.decrypt({name:'AES-GCM',iv:v.iv},KEY,v.ct)],{type:'image/jpeg'})}
+let colaLocal=Promise.resolve();
+function guardarLocal(){if(!KEY)return;const k=KEY,snap=JSON.stringify(DB);colaLocal=colaLocal.then(async()=>{if(k!==KEY)return;localStorage.setItem(LS_CACHE,JSON.stringify(await cifrar(TE.encode(snap),k)))}).catch(console.error)}
+const leerAuthLocal=()=>{try{return JSON.parse(localStorage.getItem(LS_AUTH))}catch(e){return null}};
+async function leerAuthRemoto(){const r=await gh('GET',null,'auth.json');if(r.status===404)return{nuevo:true};if(!r.ok)throw new Error(r.status===401?'El token es inválido o venció':r.status===403?'El token no tiene permiso sobre ese repositorio':'Error '+r.status);const j=await r.json();return{auth:JSON.parse(b64d(j.content)),sha:j.sha}}
+async function escribirAuthRemoto(pass,sha){const salt=u8b64(crypto.getRandomValues(new Uint8Array(16))),iter=250000;const d=await derivar(pass,salt,iter);const a={v:1,salt,iter,verif:d.verif,actualizado:new Date().toISOString()};
+  const body={message:'Contraseña de la app actualizada',content:b64e(JSON.stringify(a,null,1))};if(sha)body.sha=sha;const r=await gh('PUT',body,'auth.json');if(!r.ok)throw new Error('No se pudo guardar auth.json ('+r.status+')');return{a,d}}
+async function guardarAuthLocal(a,d,token){const prev=KEY;KEY=d.key;localStorage.setItem(LS_AUTH,JSON.stringify({user:GH.user,repo:GH.repo,salt:a.salt,iter:a.iter,verif:a.verif,tok:await cifrar(TE.encode(token))}));if(prev!==KEY)guardarLocal()}
+
+let authModo='login',authRemoto=null,tokenPendiente=null,fallos=0,ocultoDesde=0;
+function mostrarAuth(modo,msg=''){
+  authModo=modo;const c=$('#authCard'),loc=leerAuthLocal();
+  const logo=`<div class="auth-logo">${ic('wallet')}</div>`;
+  if(modo==='setup'){const old=JSON.parse(localStorage.getItem(LS_GH)||'null')||{};
+    c.innerHTML=`${logo}<h2>Configurar este dispositivo</h2><p class="sub">Solo se hace una vez por celular o PC</p>
+    <label>Usuario de GitHub</label><input id="a_user" value="${esc(old.user||'camilo14ca')}" autocapitalize="off" autocomplete="username">
+    <label>Repositorio privado de datos</label><input id="a_repo" value="${esc(old.repo||'prestamos-datos')}" autocapitalize="off">
+    <label>Token de GitHub</label><input id="a_tok" type="password" value="${esc(old.token||'')}" placeholder="github_pat_…" autocapitalize="off" autocomplete="off">
+    <label>Contraseña de la app</label><input id="a_pass" type="password" autocomplete="current-password" placeholder="Mínimo 6 caracteres">
+    <div id="a_conf" style="display:none"><label>Confirma la contraseña nueva</label><input id="a_pass2" type="password" autocomplete="new-password"></div>
+    <button class="btn" id="a_btn" onclick="enviarSetup()">${ic('lock')} Conectar</button><div class="err" id="a_err">${esc(msg)}</div>`;
+  }else if(modo==='cambio'){
+    c.innerHTML=`${logo}<h2>Contraseña actualizada</h2><p class="sub">La contraseña se cambió desde otro dispositivo. Escribe la nueva.</p>
+    <label>Contraseña nueva</label><input id="a_pass" type="password" autocomplete="current-password">
+    <button class="btn" id="a_btn" onclick="enviarCambioRemoto()">${ic('lock')} Entrar</button><div class="err" id="a_err">${esc(msg)}</div>
+    <button class="lnk" onclick="mostrarAuth('login')">Volver</button>`;
+  }else{
+    c.innerHTML=`${logo}<h2>Préstamos</h2><p class="sub">${loc?esc(loc.user)+' · '+esc(loc.repo):''}</p>
+    <input type="text" value="${esc(loc?loc.user:'')}" autocomplete="username" hidden>
+    <label>Contraseña</label><input id="a_pass" type="password" autocomplete="current-password" placeholder="••••••••">
+    <button class="btn" id="a_btn" onclick="enviarLogin()">${ic('lock')} Entrar</button><div class="err" id="a_err">${esc(msg)}</div>
+    <button class="lnk" onclick="if(confirm('¿Configurar de nuevo este dispositivo? Tendrás que escribir usuario, repositorio, token y contraseña.')){localStorage.removeItem(LS_AUTH);localStorage.removeItem(LS_CACHE);mostrarAuth('setup')}">¿Token nuevo u otra cuenta? Configurar de nuevo</button>`;
+  }
+  $('#auth').classList.remove('off');
+  c.querySelectorAll('input').forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')$('#a_btn').click()}));
+  setTimeout(()=>{const f=c.querySelector(modo==='setup'&&!$('#a_tok').value?'#a_tok':'#a_pass');f&&f.focus()},50);
+}
+function authCargando(on,txt){const b=$('#a_btn');if(!b)return;b.disabled=on;b.style.opacity=on?.6:1;if(on){b.dataset.t=b.innerHTML;b.textContent=txt||'Verificando…'}else if(b.dataset.t)b.innerHTML=b.dataset.t}
+const authErr=m=>{$('#a_err').textContent=m;authCargando(false)};
+
+async function enviarSetup(){
+  const u=val('a_user').trim(),r=val('a_repo').trim(),t=val('a_tok').trim(),p=val('a_pass');
+  if(!u||!r||!t)return authErr('Completa usuario, repositorio y token');
+  if(p.length<6)return authErr('La contraseña debe tener mínimo 6 caracteres');
+  authCargando(true);GH={user:u,repo:r,token:t};
+  try{
+    const rr=await fetch(`https://api.github.com/repos/${encodeURIComponent(u)}/${encodeURIComponent(r)}`,{headers:{'Authorization':'Bearer '+t,'Accept':'application/vnd.github+json'},cache:'no-store'});
+    if(rr.status===401)throw new Error('El token es inválido o venció');
+    if(!rr.ok)throw new Error('No encuentro el repositorio '+u+'/'+r+' o el token no tiene acceso');
+    const rem=await leerAuthRemoto();let a,d;
+    if(rem.nuevo){
+      const conf=$('#a_conf');if(conf.style.display==='none'){conf.style.display='block';authCargando(false);$('#a_err').textContent='Primera vez: confirma tu contraseña nueva';$('#a_pass2').focus();return}
+      if(p!==val('a_pass2'))return authErr('Las contraseñas no coinciden');
+      ({a,d}=await escribirAuthRemoto(p));
+    }else{a=rem.auth;d=await derivar(p,a.salt,a.iter);if(d.verif!==a.verif){GH=null;return authErr('Contraseña incorrecta')}}
+    const viejo=(()=>{try{return JSON.parse(localStorage.getItem(LS_DATA))}catch(e){return null}})();
+    try{indexedDB.deleteDatabase('prestamos_img')}catch(e){};IMGDB=null;
+    await guardarAuthLocal(a,d,t);
+    [LS_DATA,LS_GH].forEach(k=>localStorage.removeItem(k)); // quitar datos viejos sin cifrar
+    DB=viejo&&viejo.prestamos?fix(viejo):vacio();
+    entrar();
+  }catch(e){GH=null;KEY=null;authErr(e.message||'Error de conexión')}
+}
+async function enviarLogin(){
+  const loc=leerAuthLocal();if(!loc)return mostrarAuth('setup');
+  const p=val('a_pass');if(!p)return authErr('Escribe tu contraseña');
+  if(fallos>=5){const w=Math.min(30,(fallos-4)*5);authErr(`Demasiados intentos. Espera ${w} s`);$('#a_btn').disabled=true;setTimeout(()=>{const b=$('#a_btn');if(b)b.disabled=false},w*1000);fallos++;return}
+  authCargando(true);
+  const d=await derivar(p,loc.salt,loc.iter);let token;
+  try{token=TD.decode(await descifrar(loc.tok,d.key))}catch(e){fallos++;return authErr('Contraseña incorrecta')}
+  fallos=0;GH={user:loc.user,repo:loc.repo,token};
+  try{const rem=await leerAuthRemoto();
+    if(!rem.nuevo&&rem.auth.verif!==loc.verif){authRemoto=rem.auth;tokenPendiente=token;GH=null;return mostrarAuth('cambio')}
+    if(rem.nuevo){await escribirAuthRemoto(p)}
+  }catch(e){if(/inválido|permiso/.test(e.message)){GH=null;return authErr(e.message+'. Usa "Configurar de nuevo".')}/* sin internet: entra con lo guardado */}
+  KEY=d.key;entrar();
+}
+async function enviarCambioRemoto(){
+  const p=val('a_pass');if(!p)return authErr('Escribe la contraseña nueva');authCargando(true);
+  const d=await derivar(p,authRemoto.salt,authRemoto.iter);if(d.verif!==authRemoto.verif)return authErr('Contraseña incorrecta');
+  const loc=leerAuthLocal();GH={user:loc.user,repo:loc.repo,token:tokenPendiente};
+  let cache=null;try{const c=JSON.parse(localStorage.getItem(LS_CACHE));if(c)cache=c}catch(e){}
+  localStorage.removeItem(LS_CACHE);try{indexedDB.deleteDatabase('prestamos_img')}catch(e){};IMGDB=null;
+  await guardarAuthLocal(authRemoto,d,tokenPendiente);tokenPendiente=null;DB=vacio();entrar(true);
+}
+async function entrar(sinCache){
+  if(!sinCache){try{const c=JSON.parse(localStorage.getItem(LS_CACHE));if(c)DB=fix(JSON.parse(TD.decode(await descifrar(c))))}catch(e){console.warn('cache',e)}}
+  $('#auth').classList.add('off');$('#authCard').innerHTML='';irA('inicio');renderTodo();setBadge('● Conectando…');syncNow();
+}
+function cerrarSesion(silencioso){
+  KEY=null;GH=null;tokenPendiente=null;DB=vacio();Object.values(URLS).forEach(u=>{try{URL.revokeObjectURL(u)}catch(e){}});URLS={};CARGANDO={};
+  cerrar();renderTodo();setBadge('● Bloqueado');
+  if(leerAuthLocal())mostrarAuth('login',silencioso===true?'':'Sesión cerrada');else mostrarAuth('setup');
+}
+function abrirCambioClave(){
+  abrir(`<h3>Cambiar contraseña<button class="x" onclick="cerrar()">${ic('x','width:18px;height:18px')}</button></h3>
+  <p class="help">La nueva contraseña servirá en todos tus dispositivos. En los demás te la pedirá la próxima vez que entres.</p>
+  <label>Contraseña actual</label><input id="c_act" type="password" autocomplete="current-password">
+  <label>Contraseña nueva</label><input id="c_new" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
+  <label>Confirmar nueva</label><input id="c_new2" type="password" autocomplete="new-password">
+  <div class="btns"><button class="btn" id="c_btn" onclick="guardarCambioClave()">${ic('lock')} Guardar contraseña</button></div>`);
+}
+async function guardarCambioClave(){
+  const loc=leerAuthLocal(),a=val('c_act'),n=val('c_new'),n2=val('c_new2');
+  if(n.length<6)return toast('La nueva debe tener mínimo 6 caracteres');if(n!==n2)return toast('Las contraseñas nuevas no coinciden');
+  const b=$('#c_btn');b.disabled=true;b.textContent='Guardando…';
+  try{const d0=await derivar(a,loc.salt,loc.iter);if(d0.verif!==loc.verif)throw new Error('La contraseña actual no es correcta');
+    const rem=await leerAuthRemoto();const {a:na,d}=await escribirAuthRemoto(n,rem.sha);
+    const viejaKey=KEY;
+    // re-cifrar fotos locales con la llave nueva
+    const fotos=[];for(const k of await idbKeys('img')){const bl=await leerImgLocal(k).catch(()=>null);if(bl)fotos.push([k,new Uint8Array(await bl.arrayBuffer())])}
+    await guardarAuthLocal(na,d,GH.token);for(const [k,u8] of fotos)await idbSet('img',k,await cifrarBuf(u8));
+    cerrar();toast('Contraseña cambiada ✅');
+  }catch(e){toast(e.message);b.disabled=false;b.innerHTML=ic('lock')+' Guardar contraseña'}
+}
+function iniciarAuth(){
+  if(!window.crypto||!crypto.subtle){$('#auth').classList.remove('off');$('#authCard').innerHTML='<h2>Abre la app desde su link https</h2><p class="sub">El cifrado necesita una conexión segura.</p>';return}
+  mostrarAuth(leerAuthLocal()?'login':'setup');
+}
+
+// ================== NAVEGACIÓN ==================
+function irA(v){document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));$('#fab').style.display=v==='mas'?'none':'flex';scrollTo(0,0)}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>irA(b.dataset.v));
+document.querySelectorAll('#chipsEstado .chip').forEach(c=>c.onclick=()=>{document.querySelectorAll('#chipsEstado .chip').forEach(x=>x.classList.toggle('on',x===c));$('#fEstado').value=c.dataset.e;renderPrestamos()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrar()});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){ocultoDesde=Date.now();return}
+  if(KEY&&ocultoDesde&&Date.now()-ocultoDesde>10*60e3){cerrarSesion(true);return}
+  if(GH&&KEY&&!syncing)syncNow()});
+pintarIconos();renderTodo();iniciarAuth();
+addEventListener('online',()=>{if(GH)subirPendientes()});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
